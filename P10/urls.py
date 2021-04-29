@@ -18,6 +18,12 @@ from django.urls import path, include
 from django.conf import settings
 
 
+from rest_framework import routers
+from apiRest import views
+
+router = routers.DefaultRouter()
+router.register(r'users', views.UserViewSet)
+
 urlpatterns = [
     path('', include('apiRest.urls')),
     path('admin/', admin.site.urls),

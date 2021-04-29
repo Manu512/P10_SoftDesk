@@ -32,7 +32,12 @@ class Title(models.Model):
 
 
 class Projects(Author, Title):
-    type = models.CharField(max_length=150, blank=True)
+    BACK_END = 'back-end'
+    FRONT_END = 'front-end'
+    IOS = 'IOS'
+    ANDROID = 'Android'
+    projects_type = [(BACK_END, "back-end"), (FRONT_END, "front-end"), (IOS, "iOS"), (ANDROID, "Android")]
+    type = models.CharField(max_length=20, choices=projects_type, blank=False)
 
 
 class Contributors(models.Model):
@@ -43,11 +48,22 @@ class Contributors(models.Model):
 
 
 class Issues(Author, Title, Create_time):
-    tag = models.CharField(max_length=150, blank=True)
-    priority = models.CharField(max_length=150, blank=True)
+    LOW = 'BASSE'
+    MEDIUM = 'MOYENNE'
+    HIGH = 'HAUTE'
+    issues_priority = [(LOW, 'Basse'), (MEDIUM, 'Moyenne'), (HIGH, 'Haute')]
+    BUG = 'BUG'
+    AMELIORATION = 'AMELIORATION'
+    TACHE = 'TACHE'
+    issues_tag = [(BUG, 'BUG'), (AMELIORATION, 'AMÉLIORATION'), (TACHE, 'TÂCHE')]
+
+    tag = models.CharField(max_length=15, choices=issues_tag, default=TACHE)
+    priority = models.CharField(max_length=10, choices=issues_priority, default=MEDIUM)
     project_id = models.ForeignKey(to=Projects, on_delete=models.CASCADE)
-    status =  models.CharField(max_length=150, blank=True)
-    assignee_user_id = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="assignee_id_user")
+    issues_status = [('af', 'À faire'), ('ec', 'En cours'), ('T', 'Terminé')]
+    status = models.CharField(max_length=20, choices=issues_status, default='af')
+    assignee_user_id = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                         related_name="assignee_id_user")
 
 
 class Comments(Author, Title, Create_time):
