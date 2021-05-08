@@ -1,27 +1,28 @@
-from django.urls import path
+""" urls.py """
+from rest_framework_nested import routers
+from django.urls import include, path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
-    TokenVerifyView,
 )
 
 from . import views
 
+route = routers.SimpleRouter()
+route.register(r'projects', views.ProjectViewSet)
+
+project_route = routers.NestedSimpleRouter(route, r'projects', lookup='project')
+project_route.register(r'users', views.ContributorViewSet, basename='users')
+project_route.register(r'issues', views.IssueViewSet, basename='issues')
+comments_route = routers.NestedSimpleRouter(project_route, r'issues', lookup='issue')
+comments_route.register(r'comments', views.CommentViewSet, basename='comments')
 
 
 urlpatterns = [
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.login, name='login'),
-    path('projects/', views.ProjectViewSet.as_view({'get': 'list'}), name='projets'),
-    path('projects/<int:project_id>/', views.project, name='project_details'),
-    path('projects/<int:project_id>/users/', views.project, name='project_user'),
-    path('projects/<int:project_id>/users/<int:user_id>/', views.project, name='project_user_delete'),
-    path('projects/<int:project_id>/issues/', views.project, name='project_issue'),
-    path('projects/<int:project_id>/issues/<int:issue_id>', views.project, name='project_issue'),
-    path('projects/<int:project_id>/issues/<int:issue_id>/comments/', views.project, name='project_comments'),
-    path('projects/<int:project_id>/issues/<int:issue_id>/comments/<int:comment_id>',
-         views.project, name='project_comment'),
+    path('', include(route.urls), name="api"),
+    path('', include(project_route.urls), name="project"),
+    path('', include(comments_route.urls), name="comment"),
+    path('admin/', include('rest_framework.urls', namespace='rest_framework')),
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('signup/', views.UserSignup.as_view({'post': 'create'}), name='create_user'),
 ]

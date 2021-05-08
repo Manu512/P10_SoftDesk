@@ -18,20 +18,13 @@ from django.urls import path, include
 from django.conf import settings
 
 
-from rest_framework import routers
-from apiRest import views
-
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-
 urlpatterns = [
-    path('', include('apiRest.urls')),
+    path('api/', include('apiRest.urls')),
     path('admin/', admin.site.urls),
-
 ]
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
-            path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+    urlpatterns = urlpatterns + [
+           path('__debug__/', include(debug_toolbar.urls)),
+    ]
