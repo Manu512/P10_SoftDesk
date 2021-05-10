@@ -44,9 +44,8 @@ class Contributor(models.Model):
     """
     # TODO : La liste des permissions est a revoir
     permissions_list = [
-            ("access_project", "Can access project and comments (CREATE, READ comments)"),
-            ("createur", "Full access to project (UPDATE + DELETE project)"),
-            ("author_comment", "Can update/delete his comment"),
+            ("limited", "Lecture + Création de problèmes"),
+            ("all", "Full access to project (UPDATE + DELETE project)"),
     ]
 
     role_list = [
@@ -57,8 +56,8 @@ class Contributor(models.Model):
 
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='contributor', on_delete=models.CASCADE)
     project = models.ForeignKey(to=Project, related_name="contributor", on_delete=models.CASCADE)
-    permission = models.CharField(max_length=20, choices=permissions_list)
-    role = models.CharField(max_length=150, choices=role_list, blank=False, null=False)
+    permission = models.CharField(max_length=20, choices=permissions_list, blank=False, null=False, default='limited')
+    role = models.CharField(max_length=150, choices=role_list, blank=True, null=True, default="")
 
     class Meta:
         constraints = [
@@ -71,10 +70,10 @@ class Issue(CreateTime):
     """
     Object Issue qui permet de définir un problème sur un projet.
     """
-    LOW = 'BASSE'
+    LOW = 'FAIBLE'
     MEDIUM = 'MOYENNE'
-    HIGH = 'HAUTE'
-    issue_priority = [(LOW, 'Basse'), (MEDIUM, 'Moyenne'), (HIGH, 'Haute')]
+    HIGH = 'ELEVEE'
+    issue_priority = [(LOW, 'FAIBLE'), (MEDIUM, 'MOYENNE'), (HIGH, 'ELEVEE')]
     BUG = 'BUG'
     AMELIORATION = 'AMELIORATION'
     TACHE = 'TACHE'

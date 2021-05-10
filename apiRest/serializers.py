@@ -20,15 +20,13 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """
         Methode qui permet de hash le mot de passe dans la base de données. Autrement il est en clair.
-        :param validated_data:
-        :return:
         """
         validated_data["password"] = make_password(validated_data.get('password'))
         return super(UserSerializer, self).create(validated_data)
 
 
 class IssueSerializer(serializers.ModelSerializer):
-    issue_id = serializers.ReadOnlyField(source='id')
+    id = serializers.IntegerField(read_only=True)
     author_user = serializers.ReadOnlyField(source='author_user.username')
     assignee = serializers.SlugRelatedField(
             queryset=models.Users.objects.all(),
@@ -38,10 +36,9 @@ class IssueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Issue
-        fields = ['issue_id', 'title', 'description', 'tag', 'priority',
-                  'project', 'status', 'author_user',
-                  'assignee', 'created_time']
-        read_only_fields = ['project', 'author_user', 'created_time']
+        fields = ['id', 'title', 'description', 'tag', 'priority',
+                  'status', 'author_user', 'assignee', 'created_time']
+        read_only_fields = ['author_user', 'created_time']
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -49,7 +46,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Comment
-        fields = ['id', 'description', 'author_user',
+        fields = ['id', 'description', 'author',
                   'issue_id', 'created_time']
 
 
@@ -62,8 +59,7 @@ class ContributorsSerializer(serializers.ModelSerializer):
                 queryset=models.Contributor.objects.all(), fields=['project', 'user']
         )]
         model = models.Contributor
-        fields = ['user', 'project', 'permission', 'role']
-        write_only_fields = ['project', 'user']
+        fields = ['project', 'user', 'permission', 'role']
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
