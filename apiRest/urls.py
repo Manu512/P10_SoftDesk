@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
 from . import views
 
 route = routers.SimpleRouter()
-route.register(r'projects', views.ProjectViewSet)
+route.register(r'projects', views.ProjectViewSet, basename='project')
 
 project_route = routers.NestedSimpleRouter(route, r'projects', lookup='project')
 project_route.register(r'users', views.ContributorViewSet, basename='users')

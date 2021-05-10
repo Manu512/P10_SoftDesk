@@ -1,7 +1,7 @@
 """ Gestion des Permissions """
 from rest_framework import permissions
 
-from apiRest.models import Contributor
+from apiRest.models import Contributor, Project
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -12,14 +12,35 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        user = request.user.id
 
         if request.method in permissions.SAFE_METHODS:
-            authorised_user = Contributor.objects.filter(project_id=obj.id, user_id=user)
-            if authorised_user:
-                return True
-            else:
-                return False
+            return True
 
         # Write permissions are only allowed to the author of the Project.
         return obj.author_user == request.user
+
+
+class IsProjetContributor(permissions.BasePermission):
+    """
+    Custom permission to only allow contributors of an object to view it.
+    """
+
+    def has_permission(self, request, view):
+        """
+        si l'utilisateur est dans la liste des contributeurs au projet => True
+        Autorisation accordé
+        """
+        if 'project_pk' in view.kwargs:
+            data_project = view.kwargs['project_pk']
+        elif 'pk' in view.kwargs:
+            data_project = view.kwargs['pk']
+        else:
+            return True
+
+        project = Project.objects.get(pk=data_project)
+
+        try:
+            project.contributors.get(user__username=request.user)
+            return True
+        except Contributor.DoesNotExist:
+            return False

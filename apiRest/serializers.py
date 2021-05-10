@@ -34,6 +34,8 @@ class IssueSerializer(serializers.ModelSerializer):
             default=serializers.CurrentUserDefault()
     )
 
+
+
     class Meta:
         model = models.Issue
         fields = ['id', 'title', 'description', 'tag', 'priority',

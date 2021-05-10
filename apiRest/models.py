@@ -44,18 +44,18 @@ class Contributor(models.Model):
     """
     # TODO : La liste des permissions est a revoir
     permissions_list = [
-            ("limited", "Lecture + Création de problèmes"),
-            ("all", "Full access to project (UPDATE + DELETE project)"),
+            ("limited", "Contributeur"),
+            ("all", "Auteur"),
     ]
 
     role_list = [
-            ("auteur", "auteur"),
-            ("responsable", "responsable"),
-            ("createur", "créateur"),
+            ("author", "Auteur"),
+            ("responsable", "Responsable"),
+            ("creator", "Créateur"),
     ]
 
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='contributor', on_delete=models.CASCADE)
-    project = models.ForeignKey(to=Project, related_name="contributor", on_delete=models.CASCADE)
+    project = models.ForeignKey(to=Project, related_name="contributors", on_delete=models.CASCADE)
     permission = models.CharField(max_length=20, choices=permissions_list, blank=False, null=False, default='limited')
     role = models.CharField(max_length=150, choices=role_list, blank=True, null=True, default="")
 
