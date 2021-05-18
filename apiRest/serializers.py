@@ -1,7 +1,8 @@
 """ serializers.py """
-
-from rest_framework import serializers
+import django.contrib.auth.password_validation as validators
 from django.contrib.auth.hashers import make_password
+from django.core import exceptions
+from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from . import models
@@ -24,6 +25,29 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data["password"] = make_password(validated_data.get('password'))
         return super(UserSerializer, self).create(validated_data)
 
+    def validate(self, attrs):
+        """
+        Methode de validation pour forcer le passage par le validator de MDP de Django
+        Cela permet de respecté les préconisations OWASP via le paramétrage Django.
+        :param attrs: données a valider
+        :return: les paramètres validés
+        """
+        user = models.Users(**attrs)
+
+        password = attrs.get('password')
+
+        errors = dict()
+        try:
+            validators.validate_password(password=password, user=user)
+
+        except exceptions.ValidationError as e:
+            errors['password'] = list(e.messages)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
 
 class IssueSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
@@ -33,8 +57,6 @@ class IssueSerializer(serializers.ModelSerializer):
             slug_field='username',
             default=serializers.CurrentUserDefault()
     )
-
-
 
     class Meta:
         model = models.Issue
@@ -61,7 +83,7 @@ class ContributorsSerializer(serializers.ModelSerializer):
                 queryset=models.Contributor.objects.all(), fields=['project', 'user']
         )]
         model = models.Contributor
-        fields = ['project', 'user', 'permission', 'role']
+        fields = ['id', 'project', 'user', 'permission', 'role']
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):

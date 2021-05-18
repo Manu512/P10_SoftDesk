@@ -42,7 +42,6 @@ class Contributor(models.Model):
     """
     Object Contributor qui permet de définir le niveau de permission et le role de l'utilisateur sur un projet.
     """
-    # TODO : La liste des permissions est a revoir
     permissions_list = [
             ("limited", "Contributeur"),
             ("all", "Auteur"),
