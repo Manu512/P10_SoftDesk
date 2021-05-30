@@ -33,4 +33,4 @@ A ce moment, l'api sera accessible à l'URL [http://127.0.0.1:8000/](http://127.
 ## Utilisation
 
 
-lien documentation PostMan : 
+lien documentation PostMan : https://documenter.getpostman.com/view/15567806/TzRX9kbR
