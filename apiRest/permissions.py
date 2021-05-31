@@ -36,8 +36,10 @@ class IsProjetContributor(permissions.BasePermission):
             data_project = view.kwargs['pk']
         else:
             return True
-
-        project = Project.objects.get(pk=data_project)
+        try:
+            project = Project.objects.get(pk=data_project)
+        except Project.DoesNotExist:
+            return False
 
         try:
             project.contributors.get(user__username=request.user)
